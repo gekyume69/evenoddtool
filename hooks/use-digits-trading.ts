@@ -124,7 +124,7 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
   // the consumed proposal ID. When isBuying flips back to false, the memo returns
   // real params and useProposal re-subscribes to get a fresh proposal.
   const proposalParams: ProposalParams | null = useMemo(() => {
-    if (isBuying || !activeSymbol) return null;
+    if (isBuying || !activeSymbol || !CONTRACT_TYPES.includes(contractMode)) return null;
     const stakeNum = parseFloat(stake);
     if (!stakeNum || stakeNum <= 0) return null;
 
