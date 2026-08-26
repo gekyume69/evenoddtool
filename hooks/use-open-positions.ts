@@ -77,7 +77,7 @@ export function useOpenPositions(
     const unsubscribeListener = ws.onMessage((data) => {
       if (data.msg_type !== 'proposal_open_contract') return;
       const contract = data.proposal_open_contract as OpenPosition | undefined;
-      if (!contract || !['DIGITEVEN', 'DIGITODD'].includes(contract.contract_type)) return;
+      if (!contract) return;
 
       const isClosed =
         !!contract.is_sold || !!contract.is_expired || contract.status !== 'open';

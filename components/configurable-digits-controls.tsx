@@ -68,16 +68,45 @@ const BLOCK_LABELS: Record<ControlKey, string> = {
 };
 
 const DIGIT_TRADE_TYPE_OPTIONS: { value: TradeType; label: string }[] = [
+  { value: 'matches-differs', label: 'Matches/Differs' },
+  { value: 'over-under', label: 'Over/Under' },
   { value: 'even-odd', label: 'Even/Odd' },
 ];
 
-const CONTRACT_MODE_OPTIONS: { value: ContractMode; label: string }[] = [
-  { value: 'DIGITEVEN', label: 'Even' },
-  { value: 'DIGITODD', label: 'Odd' },
-];
+const CONTRACT_MODE_OPTIONS: Record<TradeType, { value: ContractMode; label: string }[]> = {
+  'matches-differs': [
+    { value: 'DIGITMATCH', label: 'Matches' },
+    { value: 'DIGITDIFF', label: 'Differs' },
+  ],
+  'over-under': [
+    { value: 'DIGITOVER', label: 'Over' },
+    { value: 'DIGITUNDER', label: 'Under' },
+  ],
+  'even-odd': [
+    { value: 'DIGITEVEN', label: 'Even' },
+    { value: 'DIGITODD', label: 'Odd' },
+  ],
+};
 
 function getPredictionText(contractMode: ContractMode): string {
-  return contractMode === 'DIGITEVEN' ? 'be even' : 'be odd';
+  switch (contractMode) {
+    case 'DIGITMATCH':
+      return 'match';
+    case 'DIGITDIFF':
+      return 'differ from';
+    case 'DIGITOVER':
+      return 'be over';
+    case 'DIGITUNDER':
+      return 'be under';
+    case 'DIGITEVEN':
+      return 'be even';
+    case 'DIGITODD':
+      return 'be odd';
+  }
+}
+
+function showDigitInPrediction(contractMode: ContractMode): boolean {
+  return contractMode !== 'DIGITEVEN' && contractMode !== 'DIGITODD';
 }
 
 export interface ConfigurableDigitsControlsProps {
@@ -363,6 +392,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   // Real control = DigitStatsBar (includes digit selection). All variants keep
   // onDigitSelect / selectedDigit, and digit stats only show for non-even/odd.
   const renderDigitStats = () => {
+    if (tradeType === 'even-odd') return null;
     const maxPct = Math.max(...digitStats.percentages);
     const minPct = Math.min(...digitStats.percentages);
 
@@ -457,7 +487,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   // ── Contract mode (3 styles) ────────────────────────────────────────────
   // Real control = ToggleGroup. Every variant keeps onContractModeChange.
   const renderContractMode = () => {
-    const modeOptions = CONTRACT_MODE_OPTIONS;
+    const modeOptions = CONTRACT_MODE_OPTIONS[tradeType];
 
     const variants: Record<StyleVariant, () => React.ReactNode> = {
       // a — segmented pill (current)
@@ -654,7 +684,8 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   // Real control = the bordered prediction box. Same data in every variant.
   const renderPrediction = () => {
     const predictionText = getPredictionText(contractMode);
-      const payoutEl =
+    const showDigit = showDigitInPrediction(contractMode);
+    const payoutEl =
       proposal || isProposalLoading ? (
         isProposalLoading ? (
           <Skeleton className="h-4 w-24" />
@@ -671,6 +702,14 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           <p className="text-xs font-medium sm:text-sm">
             Last digit of the price will{' '}
             <span className="text-primary font-bold">{predictionText}</span>
+            {showDigit && (
+              <>
+                {' '}
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                  {selectedDigit}
+                </span>
+              </>
+            )}
           </p>
           {(proposal || isProposalLoading) && (
             <div className="flex items-center justify-between border-t border-border pt-1">
@@ -685,6 +724,14 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">
           <span className="font-medium">
             Last digit will <span className="text-primary font-bold">{predictionText}</span>
+            {showDigit && (
+              <>
+                {' '}
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                  {selectedDigit}
+                </span>
+              </>
+            )}
           </span>
           {payoutEl}
         </div>
@@ -694,7 +741,14 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         <div className="flex w-full items-center justify-between gap-2 rounded-md bg-muted/40 px-3 py-2 text-xs">
           <span className="font-medium">
             Will <span className="text-primary font-bold">{predictionText}</span>
-
+            {showDigit && (
+              <>
+                {' '}
+                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {selectedDigit}
+                </span>
+              </>
+            )}
           </span>
           {payoutEl ?? <span className="text-muted-foreground">Payout</span>}
         </div>

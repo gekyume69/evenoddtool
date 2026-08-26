@@ -18,7 +18,7 @@ import type { UseBaseTradingParams } from '@/hooks/use-base-trading';
 import { computeDigitStats, getLastDigit } from '../lib/digit-stats';
 import type { ContractMode, TradeType, DigitStats, OpenPosition, ClosedPosition } from '../lib/types';
 
-const CONTRACT_TYPES = ['DIGITEVEN', 'DIGITODD'];
+const CONTRACT_TYPES = ['DIGITMATCH', 'DIGITDIFF', 'DIGITOVER', 'DIGITUNDER', 'DIGITEVEN', 'DIGITODD'];
 
 interface UseDigitsTradingReturn {
   isConnected: boolean;
@@ -85,8 +85,8 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
   } = useBaseTrading({ ws, isConnected, isExhausted, isAuthenticated, onAuthWSFailed, contractTypes: CONTRACT_TYPES });
 
   // Digits-specific trade state
-  const [tradeType, setTradeTypeRaw] = useState<TradeType>('even-odd');
-  const [contractMode, setContractMode] = useState<ContractMode>('DIGITEVEN');
+  const [tradeType, setTradeTypeRaw] = useState<TradeType>('matches-differs');
+  const [contractMode, setContractMode] = useState<ContractMode>('DIGITMATCH');
   const [selectedDigit, setSelectedDigit] = useState<number>(5);
   const [stake, setStake] = useState<string>('10');
   const [duration, setDuration] = useState<number>(5);
@@ -94,7 +94,17 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
   // Reset contract mode to the first option of the selected trade type
   const setTradeType = useCallback((type: TradeType) => {
     setTradeTypeRaw(type);
-    setContractMode('DIGITEVEN');
+    switch (type) {
+      case 'matches-differs':
+        setContractMode('DIGITMATCH');
+        break;
+      case 'over-under':
+        setContractMode('DIGITOVER');
+        break;
+      case 'even-odd':
+        setContractMode('DIGITEVEN');
+        break;
+    }
   }, []);
 
   const digitStats: DigitStats = useMemo(
@@ -124,7 +134,7 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
   // the consumed proposal ID. When isBuying flips back to false, the memo returns
   // real params and useProposal re-subscribes to get a fresh proposal.
   const proposalParams: ProposalParams | null = useMemo(() => {
-    if (isBuying || !activeSymbol || !CONTRACT_TYPES.includes(contractMode)) return null;
+    if (isBuying || !activeSymbol) return null;
     const stakeNum = parseFloat(stake);
     if (!stakeNum || stakeNum <= 0) return null;
 

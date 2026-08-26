@@ -44,11 +44,7 @@ export function useClosedPositions(
         sort: 'DESC',
         limit: 50,
       });
-      setPositions(
-        (response.profit_table?.transactions ?? []).filter((position) =>
-          ['DIGITEVEN', 'DIGITODD'].includes(position.contract_type)
-        )
-      );
+      setPositions(response.profit_table?.transactions ?? []);
     } catch {
       // silent — table simply stays empty on error
     } finally {

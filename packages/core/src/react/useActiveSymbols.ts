@@ -6,7 +6,6 @@ import type { ActiveSymbol, ContractsForResponse, ContractInfo, DurationLimits }
 import { pickDefaultSymbol } from '../utils/pick-default-symbol';
 
 const SYMBOL_PARAM = 'symbol';
-const ALLOWED_CONTRACT_TYPES = new Set(['DIGITEVEN', 'DIGITODD']);
 
 function readSymbolFromUrl(): string | undefined {
   if (typeof window === 'undefined') return undefined;
@@ -51,7 +50,7 @@ export function useActiveSymbols(
     });
 
     const filtered = response.contracts_for?.available?.filter(
-      (c) => contractTypes.includes(c.contract_type) && ALLOWED_CONTRACT_TYPES.has(c.contract_type)
+      (c) => contractTypes.includes(c.contract_type)
     ) ?? [];
     setContracts(filtered);
     setContractsAvailable(filtered.length > 0);

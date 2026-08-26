@@ -27,6 +27,8 @@ import type { ContractMode, TradeType, DigitStats } from '../lib/types';
 import type { DigitsAppConfig } from '../lib/app-config';
 
 const DIGIT_TRADE_TYPE_OPTIONS: { value: TradeType; label: string }[] = [
+  { value: 'matches-differs', label: 'Matches/Differs' },
+  { value: 'over-under', label: 'Over/Under' },
   { value: 'even-odd', label: 'Even/Odd' },
 ];
 
@@ -288,7 +290,7 @@ export function DigitsView({
               <div className="flex gap-2">
                 <Skeleton className="h-8 w-32 rounded-full" />
                 <Skeleton className="h-8 w-28 rounded-full" />
-
+                <Skeleton className="h-8 w-24 rounded-full" />
               </div>
               {/* Main card skeleton */}
               <Skeleton className="w-full h-[420px] rounded-xl" />
