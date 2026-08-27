@@ -37,40 +37,13 @@ interface TradeControlsProps {
   isAuthenticated?: boolean;
 }
 
-const CONTRACT_MODE_OPTIONS: Record<TradeType, { value: ContractMode; label: string }[]> = {
-  'matches-differs': [
-    { value: 'DIGITMATCH', label: 'Matches' },
-    { value: 'DIGITDIFF', label: 'Differs' },
-  ],
-  'over-under': [
-    { value: 'DIGITOVER', label: 'Over' },
-    { value: 'DIGITUNDER', label: 'Under' },
-  ],
-  'even-odd': [
-    { value: 'DIGITEVEN', label: 'Even' },
-    { value: 'DIGITODD', label: 'Odd' },
-  ],
-};
+const CONTRACT_MODE_OPTIONS: { value: ContractMode; label: string }[] = [
+  { value: 'DIGITEVEN', label: 'Even' },
+  { value: 'DIGITODD', label: 'Odd' },
+];
 
 function getPredictionText(contractMode: ContractMode): string {
-  switch (contractMode) {
-    case 'DIGITMATCH':
-      return 'match';
-    case 'DIGITDIFF':
-      return 'differ from';
-    case 'DIGITOVER':
-      return 'be over';
-    case 'DIGITUNDER':
-      return 'be under';
-    case 'DIGITEVEN':
-      return 'be even';
-    case 'DIGITODD':
-      return 'be odd';
-  }
-}
-
-function showDigitInPrediction(contractMode: ContractMode): boolean {
-  return contractMode !== 'DIGITEVEN' && contractMode !== 'DIGITODD';
+  return contractMode === 'DIGITEVEN' ? 'be even' : 'be odd';
 }
 
 export function TradeControls({
@@ -109,7 +82,7 @@ export function TradeControls({
     }
   }, [buyResult, onClearBuyResult]);
 
-  const modeOptions = CONTRACT_MODE_OPTIONS[tradeType];
+  const modeOptions = CONTRACT_MODE_OPTIONS;
 
   return (
     <div className="space-y-2 sm:space-y-4">
@@ -175,14 +148,7 @@ export function TradeControls({
         <p className="text-xs sm:text-sm font-medium">
           Last digit of the price will{' '}
           <span className="text-primary font-bold">{getPredictionText(contractMode)}</span>
-          {showDigitInPrediction(contractMode) && (
-            <>
-              {' '}
-              <span className="inline-flex w-5 h-5 rounded-full bg-primary text-primary-foreground items-center justify-center text-xs font-bold">
-                {selectedDigit}
-              </span>
-            </>
-          )}
+
         </p>
         {(proposal || isProposalLoading) && (
           <div className="flex items-center justify-between pt-1 border-t border-border">

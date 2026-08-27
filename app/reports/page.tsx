@@ -12,10 +12,6 @@ import Link from 'next/link';
 import { PositionsTable } from '@/components/custom/positions-table';
 
 const DIGIT_CONTRACT_LABELS: Record<string, string> = {
-  DIGITMATCH: 'Digit Match',
-  DIGITDIFF: 'Digit Differs',
-  DIGITOVER: 'Digit Over',
-  DIGITUNDER: 'Digit Under',
   DIGITEVEN: 'Digit Even',
   DIGITODD: 'Digit Odd',
 };
